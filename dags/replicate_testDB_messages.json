@@ -1,0 +1,112 @@
+{
+    "source": {
+        "database": "testDB",
+        "url": "jdbc:sqlserver://host.docker.internal:31433;database=testDB;user=sa;password=P@$$w0rd;encrypt=false"
+    },
+    "destination": {
+        "database": "testDBWH",
+        "url": "jdbc:sqlserver://host.docker.internal:31433;database=testDBWH;user=sa;password=P@$$w0rd;encrypt=false",
+        "pyodbc_url": "DRIVER={ODBC Driver 17 for SQL Server};SERVER=host.docker.internal,31433;DATABASE=testDBWH;UID=sa;PWD=P@$$w0rd"
+    },
+    "sparkMaster": "local[2]",
+    "sparkJars": "/opt/airflow/resources/jars/mssql-jdbc-13.2.0.jre11.jar",
+    "sparkExecutorMemory": "1g",
+    "sparkDriverMemory": "1g",
+    "sparkExecutorCores": "2",
+    "sparkCoresMax": "2",
+    "processNoOfRows": 500,
+    "configFile": "/opt/airflow/dags/replicate_testDB_messages.json",
+    "offsetPreloadTimestamp": "2025-11-26 18:44:59.9443616",
+    "tables": [
+        {
+            "name": "customers",
+            "archive": "customers_archive",
+            "dateKeyFrom": "valid_from",
+            "dateKeyTo": "valid_to",
+            "mainSelect": [
+                "[id] = A.[id]",
+                "[first_name] = A.[first_name]",
+                "[last_name] = A.[last_name]",
+                "[email] =  A.[email]",
+                "[valid_from] = A2.[valid_from]",
+                "[valid_to] = CASE WHEN A2.[id] IS NULL THEN CAST(A2.[valid_from] AS DATETIME2(0)) ELSE A2.[valid_from] END"
+            ],
+            "archiveSelect": [
+                "[id] = A.[id]",
+                "[first_name] = A.[first_name]",
+                "[last_name] = A.[last_name]",
+                "[email] =  A.[email]",
+                "[valid_from] = CASE WHEN A1.[deleted] = 1 THEN CAST(A.[valid_to] AS DATETIME2(0)) ELSE A.[valid_to] END",
+                "[valid_to] = CAST('9999-12-31 23:59:59.9999999' AS DATETIME2(7))"
+            ],
+            "idKey": "id"
+        }, 
+        {
+            "name": "products",
+            "archive": "products_archive",
+            "dateKeyFrom": "valid_from",
+            "dateKeyTo": "valid_to",
+            "mainSelect": [
+                "[id] = A.[id]",
+                "[name] = A.[name]",
+                "[description] = A.[description]",
+                "[weight] =  A.[weight]",
+                "[valid_from] = A.[valid_from]",
+                "[valid_to] = CASE WHEN A2.[id] IS NULL THEN CAST(A2.[valid_from] AS DATETIME2(0)) ELSE A2.[valid_from] END"
+            ],
+            "archiveSelect": [
+                "[id] = A.[id]",
+                "[name] = A.[name]",
+                "[description] = A.[description]",
+                "[weight] =  A.[weight]",
+                "[valid_from] = CASE WHEN A1.[deleted] = 1 THEN CAST(A.[valid_to] AS DATETIME2(0)) ELSE A.[valid_to] END",
+                "[valid_to] = CAST('9999-12-31 23:59:59.9999999' AS DATETIME2(7))"
+            ],
+            "idKey": "id"
+        }, 
+        {
+            "name": "products_on_hand",
+            "archive": "products_on_hand_archive",
+            "dateKeyFrom": "valid_from",
+            "dateKeyTo": "valid_to",
+            "mainSelect": [
+                "[product_id] = A.[product_id]",
+                "[quantity] = A.[quantity]",
+                "[valid_from] = A.[valid_from]",
+                "[valid_to] = CASE WHEN A2.[product_id] IS NULL THEN CAST(A2.[valid_from] AS DATETIME2(0)) ELSE A2.[valid_from] END"
+            ],
+            "archiveSelect": [
+                "[product_id] = A.[product_id]",
+                "[quantity] = A.[quantity]",
+                "[valid_from] = CASE WHEN A1.[deleted] = 1 THEN CAST(A.[valid_to] AS DATETIME2(0)) ELSE A.[valid_to] END",
+                "[valid_to] = CAST('9999-12-31 23:59:59.9999999' AS DATETIME2(7))"
+            ],
+            "idKey": "product_id"
+        },
+        {
+            "name": "orders",
+            "archive": "orders_archive",
+            "dateKeyFrom": "valid_from",
+            "dateKeyTo": "valid_to",
+            "mainSelect": [
+                "[id] = A.[id]",
+                "[order_date] = A.[order_date]",
+                "[purchaser] = A.[purchaser]",
+                "[quantity] =  A.[quantity]",
+                "[product_id] = A.[product_id]",
+                "[valid_from] = A.[valid_from]",
+                "[valid_to] = CASE WHEN A2.[id] IS NULL THEN CAST(A2.[valid_from] AS DATETIME2(0)) ELSE A2.[valid_from] END"
+            ],
+            "archiveSelect": [
+                "[id] = A.[id]",
+                "[order_date] = A.[order_date]",
+                "[purchaser] = A.[purchaser]",
+                "[quantity] =  A.[quantity]",
+                "[product_id] = A.[product_id]",
+                "[valid_from] = CASE WHEN A1.[deleted] = 1 THEN CAST(A.[valid_to] AS DATETIME2(0)) ELSE A.[valid_to] END",
+                "[valid_to] = CAST('9999-12-31 23:59:59.9999999' AS DATETIME2(7))"
+            ],
+            "idKey": "id"
+        } 
+    ]
+}

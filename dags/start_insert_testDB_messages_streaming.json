@@ -1,0 +1,158 @@
+{
+    "source": {
+        "database": "testDB",
+        "url": "jdbc:sqlserver://host.docker.internal:31433;database=testDB;user=sa;password=P@$$w0rd;encrypt=false"
+    },
+    "destination": {
+        "database": "testDB",
+        "url": "jdbc:sqlserver://host.docker.internal:31433;database=testDBWH;user=sa;password=P@$$w0rd;encrypt=false",
+        "pyodbc_url": "DRIVER={ODBC Driver 17 for SQL Server};SERVER=host.docker.internal,31433;DATABASE=testDBWH;UID=sa;PWD=P@$$w0rd"
+    },
+    "sparkMaster": "local[3]",
+    "sparkJars": "/opt/airflow/resources/jars/mssql-jdbc-13.2.0.jre11.jar",
+    "sparkExecutorMemory": "2g",
+    "sparkDriverMemory": "2g",
+    "sparkExecutorCores": "3",
+    "sparkCoresMax": "3",
+    "checkpointLocation": "/opt/airflow/dags/start_insert_testDB_messages_streaming_checkpoint",
+    "processNoOfRows": 10000,
+    "kafkaBroker": "host.docker.internal:29093",
+    "kafkaTopics": [
+        "server1.testDB.dbo.customers",
+        "server1.testDB.dbo.customers_archive",
+        "server1.testDB.dbo.orders",
+        "server1.testDB.dbo.orders_archive",
+        "server1.testDB.dbo.products",
+        "server1.testDB.dbo.products_archive",
+        "server1.testDB.dbo.products_on_hand",
+        "server1.testDB.dbo.products_on_hand_archive"
+    ],
+    "offsetPreloadTimestamp": "2025-11-26 18:44:59.9443616",
+    "preloadTables": [
+        {
+            "name": "customers",
+            "isArchive": false,
+            "archive": "customers_archive",
+            "archiveSelect": [
+                "[id] = A.[id]",
+                "[first_name] = A.[first_name]",
+                "[last_name] = A.[last_name]",
+                "[email] =  A.[email]",
+                "[valid_from] = A.[valid_to]",
+                "[valid_to] = CAST('9999-12-31 23:59:59.9999999' AS DATETIME2(7))"
+            ],
+            "mainTable": "",
+            "type": "ValidDateRange",
+            "dateKey": "[valid_from]",
+            "orderByKey": "id",
+            "kafkaTopic": "server1.testDB.dbo.customers",
+            "hasDeletedColumn": false
+        },
+        {
+            "name": "customers_archive",
+            "isArchive": true,
+            "archive": "",
+            "archiveSelect": [],
+            "mainTable": "customers",
+            "type": "ValidDateRange",
+            "dateKey": "[valid_to]",
+            "orderByKey": "",
+            "kafkaTopic": "server1.testDB.dbo.customers_archive",
+            "hasDeletedColumn": true
+        },
+        {
+            "name": "products",
+            "isArchive": false,
+            "archive": "products_archive",
+            "archiveSelect": [
+                "[id] = A.[id]",
+                "[name] = A.[name]",
+                "[description] = A.[description]",
+                "[weight] =  A.[weight]",
+                "[valid_from] = A.[valid_to]",
+                "[valid_to] = CAST('9999-12-31 23:59:59.9999999' AS DATETIME2(7))"
+            ],
+            "mainTable": "",
+            "type": "ValidDateRange",
+            "dateKey": "[valid_from]",
+            "orderByKey": "id",
+            "kafkaTopic": "server1.testDB.dbo.products",
+            "hasDeletedColumn": false
+        },
+        {
+            "name": "products_archive",
+            "isArchive": true,
+            "archive": "",
+            "archiveSelect": [],
+            "mainTable": "products",
+            "type": "ValidDateRange",
+            "dateKey": "[valid_to]",
+            "orderByKey": "",
+            "kafkaTopic": "server1.testDB.dbo.products_archive",
+            "hasDeletedColumn": true
+        },
+        {
+            "name": "products_on_hand",
+            "isArchive": false,
+            "archive": "products_on_hand_archive",
+            "archiveSelect": [
+                "[product_id] = A.[product_id]",
+                "[quantity] = A.[quantity]",
+                "[valid_from] = A.[valid_to]",
+                "[valid_to] = CAST('9999-12-31 23:59:59.9999999' AS DATETIME2(7))"
+            ],
+            "mainTable": "",
+            "type": "ValidDateRange",
+            "dateKey": "valid_from",
+            "orderByKey": "product_id",
+            "kafkaTopic": "server1.testDB.dbo.products_on_hand",
+            "hasDeletedColumn": false
+        },
+        {
+            "name": "products_on_hand_archive",
+            "isArchive": true,
+            "archive": "",
+            "archiveSelect": [],
+            "mainTable": "products_on_hand",
+            "type": "ValidDateRange",
+            "dateKey": "[valid_to]",
+            "orderByKey": "",
+            "kafkaTopic": "server1.testDB.dbo.products_on_hand_archive",
+            "hasDeletedColumn": true
+        },
+        {
+            "name": "orders",
+            "isArchive": false,
+            "archive": "orders_archive",
+            "archiveSelect": [
+                "[id] = A.[id]",
+                "[order_date] = A.[order_date]",
+                "[purchaser] = A.[purchaser]",
+                "[quantity] =  A.[quantity]",
+                "[product_id] = A.[product_id]",
+                "[valid_from] = A.[valid_to]",
+                "[valid_to] = CAST('9999-12-31 23:59:59.9999999' AS DATETIME2(7))"
+            ],
+            "mainTable": "",
+            "type": "ValidDateRange",
+            "dateKey": "[valid_from]",
+            "orderByKey": "id",
+            "kafkaTopic": "server1.testDB.dbo.orders",
+            "hasDeletedColumn": false
+        },
+        {
+            "name": "orders_archive",
+            "isArchive": true,
+            "archive": "",
+            "archiveSelect": [],
+            "mainTable": "orders",
+            "type": "ValidDateRange",
+            "dateKey": "[valid_to]",
+            "orderByKey": "",
+            "kafkaTopic": "server1.testDB.dbo.orders_archive",
+            "hasDeletedColumn": true
+        }
+    ],
+    "configFile": "/opt/airflow/dags/start_insert_testDB_messages_streaming.json",
+    "retriesMax": 3  
+}
