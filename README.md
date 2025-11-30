@@ -51,21 +51,21 @@ In SSMS
         
 In Visual Studio Code terminal window
 + compose the application:
-  docker compose up -d
+  - docker compose up -d
 
 + start sql server connector
-  curl -i -X POST -H "Accept:application/json" -H  "Content-Type:application/json" http://localhost:18083/connectors/ -d @register-sqlserver.json
-
-  you should see something like this after registration:
+  - curl -i -X POST -H "Accept:application/json" -H  "Content-Type:application/json" http://localhost:18083/connectors/ -d @register-sqlserver.json
+  - you should see something like this after registration:
 ![alt text](README-images/register.png)
 
 + the registration does not create topics without data, in this case, the topics for the archive tables is not yet created.  So we need to create them manually so it does not error in the dag:
-  docker exec -it kafka bin/kafka-topics.sh --create --topic server1.testDB.dbo.customers_archive --bootstrap-server host.docker.internal:29093 --partitions 1 replication-factor 1
-  docker exec -it kafka bin/kafka-topics.sh --create --topic server1.testDB.dbo.products_archive --bootstrap-server host.docker.internal:29093 --partitions 1 replication-factor 1
-  docker exec -it kafka bin/kafka-topics.sh --create --topic server1.testDB.dbo.products_on_hand_archive --bootstrap-server host.docker.internal:29093 --partitions 1 replication-factor 1
-  docker exec -it kafka bin/kafka-topics.sh --create --topic server1.testDB.dbo.orders_archive --bootstrap-server host.docker.internal:29093 --partitions 1 replication-factor 1
+  - docker exec -it kafka bin/kafka-topics.sh --create --topic server1.testDB.dbo.customers_archive --bootstrap-server host.docker.internal:29093 --partitions 1 replication-factor 1
+  - docker exec -it kafka bin/kafka-topics.sh --create --topic server1.testDB.dbo.products_archive --bootstrap-server host.docker.internal:29093 --partitions 1 replication-factor 1
+  - docker exec -it kafka bin/kafka-topics.sh --create --topic server1.testDB.dbo.products_on_hand_archive --bootstrap-server host.docker.internal:29093 --partitions 1 replication-factor 1
+  - docker exec -it kafka bin/kafka-topics.sh --create --topic server1.testDB.dbo.orders_archive --bootstrap-server host.docker.internal:29093 --partitions 1 replication-factor 1
 + in the kafka-ui (http://localhost/ui/clusters/kafka-cluster/all-topics?perPage=25), you should see these topics:
-![alt text](README-images/kafka-ui.png).  if you have existing data, you should wait a little bit for the kafka to load the messages until you see some updetes, created or deletes messages before you can start streaming.    
+![alt text](README-images/kafka-ui.png).
+  - if you have existing data, you should wait a little bit for the kafka to load the messages until you see some updetes, created or deletes messages before you can start streaming.    
 + in the airflow ui (http://localhost:8080/dags), you should see these dags below.
 ![alt text](README-images/airflow.png)
 + before starting these dags, the configurations needs to be updated accordingly.  some are database configs should be updated to your database source and destination.  another particular configuration, offsetPreloadTimestamp (in both dags), needs updating also using this debezium-sqlsserver-init\offsetPreloadTimestamp.sql in the source table.
@@ -80,4 +80,3 @@ If you need to do it again
 + delete records in all destination tables
 
 If you see failed in replicate_testDB_messages test task, just trigger the whole process again it will be successful. The test task is created to validate task.  It can be commented out or in a separate dag for validation in say every 30 minutes so replication is almost real-time.
-
