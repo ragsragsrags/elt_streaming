@@ -1,11 +1,11 @@
 # (E)xtract - (L)oad of data using streaming with Kafka, Debezium, Spark and Airflow 
 
 The goal for this project is to understand data streaming and practice it with a real-world use case. In this project, we will attempt to Extract and Load using data streaming with the following technologies:
-    + Apache Spark: for preloading of existing data and streaming 
-    + Apache Airflow: for orchestration
-    + Apache Kafka: for streaming
-    + Debezium: CDC stream connector to mssql server
-    + Mssql Server: database for CDC
++ Apache Spark: for preloading of existing data and streaming
++ Apache Airflow: for orchestration
++ Apache Kafka: for streaming
++ Debezium: CDC stream connector to mssql server
++ Mssql Server: database for CDC
 
 The source and destination databases are the same but these technologies supports other databases as well.  Also, this would be better if the source database is from a secondary replica server (https://github.com/debezium/debezium-examples/tree/main/sql-server-read-replica) so it does not interact with the transaction primary database.  But for practice purposes and also to minimize resources usage, I've just use primary database for CDC which is not dockerized.
 
